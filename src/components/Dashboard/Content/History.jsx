@@ -11,8 +11,8 @@ function History ({ isSwitchOn, selectedRegion }) {
   useEffect(() => {
     const fetchData = () => {
       fetchCurrentPrice(selectedRegion).then(data => {
-        setData(data.DK1);
-        const prices = data.DK1.map(d => d.DKK_per_kWh);
+        setData(data[selectedRegion]);
+        const prices = data[selectedRegion].map(d => d.DKK_per_kWh);
         setLowestPrice(Math.min(...prices));
         setHighestPrice(Math.max(...prices));
       });

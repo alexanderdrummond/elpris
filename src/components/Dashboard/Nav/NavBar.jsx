@@ -3,7 +3,7 @@ import { FaCog } from 'react-icons/fa';
 import { IconContext } from "react-icons";
 import SettingsModal from '../Settings/SettingsModal';
 
-function NavBar({ setActiveTab }) {
+function NavBar({ setActiveTab, activeTab }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const openModal = () => {
@@ -22,10 +22,10 @@ function NavBar({ setActiveTab }) {
           <h1 className="text-[#55EC20] hidden md:block">Elprisen.nu</h1>
         </div>
         <div className="md:hidden flex items-center">
-          <a href="#" className="text-white text-sm mr-3" onClick={(e) => {e.preventDefault(); setActiveTab('CurrentPrice')}}>LIGE NU</a>
-          <a href="#" className="text-white text-sm mr-3" onClick={(e) => {e.preventDefault(); setActiveTab('History')}}>OVERSIGT</a>
-          <a href="#" className="text-white text-sm" onClick={(e) => {e.preventDefault(); setActiveTab('Overview')}}>HISTORIK</a>
-        </div>
+  <a href="#" className={`text-sm mr-3 ${activeTab === 'CurrentPrice' ? 'text-elprisGreen' : 'text-white'}`} onClick={(e) => {e.preventDefault(); setActiveTab('CurrentPrice')}}>LIGE NU</a>
+  <a href="#" className={`text-sm mr-3 ${activeTab === 'History' ? 'text-elprisGreen' : 'text-white'}`} onClick={(e) => {e.preventDefault(); setActiveTab('History')}}>OVERSIGT</a>
+  <a href="#" className={`text-sm ${activeTab === 'Overview' ? 'text-elprisGreen' : 'text-white'}`} onClick={(e) => {e.preventDefault(); setActiveTab('Overview')}}>HISTORIK</a>
+</div>
         <div className="hidden md:flex items-center">
         <FaCog className="text-[#55EC20]" onClick={openModal} />
       </div>

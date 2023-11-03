@@ -3,7 +3,11 @@ export default {
   purge: ['./index.html', './src/**/*.{js,jsx}'],
   content: [],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        elprisGreen: '#55EC20',
+      },
+    },
   },
   plugins: [],
 }

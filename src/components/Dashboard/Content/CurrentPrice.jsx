@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { fetchCurrentPrice } from '../../../utils/fetchPrice';
 
 function CurrentPrice({ isSwitchOn, selectedRegion }) {
@@ -6,27 +6,53 @@ function CurrentPrice({ isSwitchOn, selectedRegion }) {
     const [timeSlot, setTimeSlot] = useState(null);
     const [lowestPrice, setLowestPrice] = useState(null);
     const [highestPrice, setHighestPrice] = useState(null);
+
+    const intervalIdRef = useRef(null);
   
     useEffect(() => {
       const fetchPrice = () => {
-        fetchCurrentPrice(selectedRegion).then(data => {
-          const currentHour = new Date().getHours();
-          const currentData = data.DK1.find(d => new Date(d.time_start).getHours() === currentHour);
-          if (currentData) {
-            setPrice(currentData.DKK_per_kWh);
-            setTimeSlot(`${currentData.time_start.slice(11, 16)} - ${currentData.time_end.slice(11, 16)}`);
-          }
-      
-          const prices = data.DK1.map(d => d.DKK_per_kWh);
-          setLowestPrice(Math.min(...prices));
-          setHighestPrice(Math.max(...prices));
-        });
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = now.getMonth() + 1;
+        const day = now.getDate();
+  
+        (caches && caches.match(`https://www.elprisenligenu.dk/api/v1/prices/${year}/${month}-${day}_${selectedRegion}.json`)
+          .then(response => {
+            if (response) {
+              return response.json();
+            }
+            
+            return fetchCurrentPrice(selectedRegion);
+          })
+          .then(data => {
+            const currentHour = new Date().getHours();
+            const currentData = data[selectedRegion].find(d => new Date(d.time_start).getHours() === currentHour);
+            if (currentData) {
+              setPrice(currentData.DKK_per_kWh);
+              setTimeSlot(`${currentData.time_start.slice(11, 16)} - ${currentData.time_end.slice(11, 16)}`);
+            }
+  
+            const prices = data[selectedRegion].map(d => d.DKK_per_kWh);
+            setLowestPrice(Math.min(...prices));
+            setHighestPrice(Math.max(...prices));
+          }));
       };
-
+  
+      
       fetchPrice();
-      const intervalId = setInterval(fetchPrice, 60 * 60 * 1000); 
-
-      return () => clearInterval(intervalId); 
+  
+      const now = new Date();
+      const delayUntilNextHour = (60 - now.getMinutes()) * 60 * 1000 - now.getSeconds() * 1000;
+  
+      const timeoutId = setTimeout(() => {
+        const intervalId = setInterval(fetchPrice, 60 * 60 * 1000);
+        intervalIdRef.current = intervalId;
+      }, delayUntilNextHour);
+  
+      return () => {
+        clearTimeout(timeoutId);
+        clearInterval(intervalIdRef.current);
+      };
     }, [isSwitchOn, selectedRegion]);
 
   return (

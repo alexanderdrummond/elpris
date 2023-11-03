@@ -1,24 +1,16 @@
-self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open('api-cache').then((cache) => {
-      return cache.addAll([
-        '/Icon.svg',
-      ]);
-    })
-  );
-});
-
 self.addEventListener('fetch', (event) => {
-  if (event.request.url.includes('elprisenligenu.dk') || event.request.url.endsWith('Icon.svg')) {
+  if (event.request.url.includes('elprisenligenu.dk')) {
     event.respondWith(
       caches.match(event.request).then((cachedResponse) => {
-        return cachedResponse || fetch(event.request).then((networkResponse) => {
-          const clonedResponseForJson = networkResponse.clone();
-          const clonedResponseForCache = networkResponse.clone();
+        if (cachedResponse) {
+          return cachedResponse;
+        }
+        return fetch(event.request).then((networkResponse) => {
+          const clonedResponse = networkResponse.clone();
           caches.open('api-cache').then((cache) => {
-            cache.put(event.request, clonedResponseForCache);
+            cache.put(event.request, clonedResponse);
           });
-          return clonedResponseForJson;
+          return networkResponse;
         });
       })
     );

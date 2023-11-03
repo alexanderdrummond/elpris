@@ -28,7 +28,7 @@ function Content({ activeTab, setActiveTab }) {
       <FaCog className="text-[#55EC20] md:hidden absolute top-0 right-0" onClick={() => setActiveTab('Settings')} />
       <div className="mx-auto flex flex-wrap justify-center md:justify-between items-start md:space-x-4 max-w-screen-lg">
         <div className={`pundefined4 flex flex-col ${activeTab === 'CurrentPrice' ? 'block' : 'hidden'} md:block`}>
-          <h2 className="text-white text-lg font-light mb-4 mt-4 text-center">ELPRISEN LIGE NU</h2>
+          <h2 className="text-white text-lg font-light mb-4 mt-8 text-center">ELPRISEN LIGE NU</h2>
           <CurrentPrice isSwitchOn={isSwitchOn} selectedRegion={selectedRegion}/>
         </div>
         <div className={`p-4 flex flex-col ${activeTab === 'History' ? 'block' : 'hidden'} md:block`}>
