@@ -19,12 +19,14 @@ function History ({ isSwitchOn, selectedRegion }) {
         fetchCurrentPrice(selectedRegion)
           .then(data => processData(data));
       } else {
-        caches.match(`https://www.elprisenligenu.dk/api/v1/prices/${year}/${month}-${day}_${selectedRegion}.json`)
-          .then(response => {
-            if (response) {
-              response.json().then(data => processData(data));
-            }
-          });
+        caches.open('api-cache').then(cache => {
+          cache.match(`https://www.elprisenligenu.dk/api/v1/prices/${year}/${month}-${day}_${selectedRegion}.json`)
+            .then(response => {
+              if (response) {
+                response.json().then(data => processData(data));
+              }
+            });
+        });
       }
     };
   
