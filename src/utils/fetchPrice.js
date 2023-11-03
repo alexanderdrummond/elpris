@@ -9,7 +9,7 @@ export async function fetchCurrentPrice(selectedRegion) {
 
   for (const priceClass of priceClasses) {
     const requestUrl = `https://www.elprisenligenu.dk/api/v1/prices/${year}/${month}-${day}_${selectedRegion}.json`;
-    const response = await fetch(requestUrl);
+    const response = await fetch(requestUrl, { cache: 'force-cache' });
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
