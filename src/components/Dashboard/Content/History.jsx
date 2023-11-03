@@ -10,17 +10,34 @@ function History ({ isSwitchOn, selectedRegion }) {
 
   useEffect(() => {
     const fetchData = () => {
-      fetchCurrentPrice(selectedRegion).then(data => {
-        setData(data[selectedRegion]);
-        const prices = data[selectedRegion].map(d => d.DKK_per_kWh);
-        setLowestPrice(Math.min(...prices));
-        setHighestPrice(Math.max(...prices));
-      });
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = now.getMonth() + 1;
+      const day = now.getDate();
+  
+      if (navigator.onLine) {
+        fetchCurrentPrice(selectedRegion)
+          .then(data => processData(data));
+      } else {
+        caches.match(`https://www.elprisenligenu.dk/api/v1/prices/${year}/${month}-${day}_${selectedRegion}.json`)
+          .then(response => {
+            if (response) {
+              response.json().then(data => processData(data));
+            }
+          });
+      }
     };
-
+  
+    const processData = (data) => {
+      setData(data[selectedRegion]);
+      const prices = data[selectedRegion].map(d => d.DKK_per_kWh);
+      setLowestPrice(Math.min(...prices));
+      setHighestPrice(Math.max(...prices));
+    };
+  
     fetchData();
     const intervalId = setInterval(fetchData, 60 * 60 * 1000); 
-
+  
     return () => clearInterval(intervalId);
   }, [isSwitchOn, selectedRegion]);
 
